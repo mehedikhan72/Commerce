@@ -1,0 +1,66 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{ name }}</h2>
+    <hr style="border-top: 2px dashed black">
+    <p>About this product : {{ description }}</p>
+    <strong><p>Current Bid: {{ price }}</p></strong>
+
+    <p>Category: {{ category }}</p>
+    <p>Created on: {{ created }}</p>
+    <p>Listed by: <strong>{{listed_by}}</strong></p>
+    <strong>Place a new bid!</strong>
+    <br>
+    <form action="{% url 'bidding' name %}" method="POST">
+        {% csrf_token %}
+        <input name="bid" type="Number" step="0.01" placeholder="Your bid" min="{{price}}">
+        <input type="submit" value="Bid">
+    </form>
+    <br>
+
+    {% if user.is_authenticated %}
+        {% if already_exists == True%}
+            <form action="{% url 'removefromwatchlist' id user.username %}">
+                {% csrf_token %}
+                <input type="submit" value="Remove from watchlist">
+            </form>
+        {% else %}
+            <form action="{% url 'addtowatchlist' id user.username %}">
+                {% csrf_token %}
+                <input type="submit" value="Add to watchlist">
+            </form>   
+        {% endif %}
+    {% endif %}
+    <br>
+    
+    {% if user.is_authenticated %}
+        <form action="{% url 'addcomments' name %}" method="POST">
+            {% csrf_token %}
+            <p>Add a comment: </p>
+            <textarea style="height: 100px; width: 250px; resize: none" name="comment" required></textarea>
+            <br>
+            <input type="submit" value="Submit">
+        </form>
+    {% else %}
+        <strong><a href="{%url 'login' %}">Login</a> to add a comment.</strong>
+    {% endif %}
+
+    <hr style="border-top: 2px dashed black">
+    <h4>Comments</h4>
+    <hr style="border-top: 2px dashed black">
+
+    {% for comment in comments %}
+        <div class="items">
+            <strong><P>{{comment.comm_person_id}}</P></strong>
+            <p style="font-size: 1.1rem">{{comment.comm}}</p>
+            <p style="font-size: 0.9rem">{{comment.commented}}</p>
+        </div>
+        <br>
+    {% endfor%}
+
+{% endblock %} 
+
+
+
+
+

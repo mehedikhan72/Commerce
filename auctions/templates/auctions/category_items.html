@@ -1,0 +1,17 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<h2>{{ category }}</h2>
+<hr style="border-top: 2px dashed black">
+{% for listing in listings %}
+<div class="items">
+    <h4>{{ listing.name }}</h4>
+    <P>Current bid: ${{ listing.price }}</P>
+    <p>Description: {{ listing.description }}</p>
+    <a href="{% url 'details' listing.name %}">View details</a>
+</div>
+<br>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{ current_user }}'s watchlist</h2>
+    <hr style="border-top: 2px dashed black">
+    {% for listing in watchlist_items %}
+        <div class="items">
+            <h4>{{ listing.name }}</h4>
+            <P>Current bid: ${{ listing.price }}</P>
+            <p>Description: {{ listing.description }}</p>
+            <a href="{% url 'details' listing.name %}">View details</a>
+            <br>
+            <strong>Watchlisted</strong>
+        </div>
+        <br>
+    {% endfor %}
+{% endblock %}
