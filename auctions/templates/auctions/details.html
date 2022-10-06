@@ -1,49 +1,97 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>{{ name }}</h2>
-    <hr style="border-top: 2px dashed black">
-    <p>About this product : {{ description }}</p>
-    <strong><p>Current Bid: {{ price }}</p></strong>
 
-    <p>Category: {{ category }}</p>
-    <p>Created on: {{ created }}</p>
-    <p>Listed by: <strong>{{listed_by}}</strong></p>
-    <strong>Place a new bid!</strong>
-    <br>
-    <form action="{% url 'bidding' name %}" method="POST">
-        {% csrf_token %}
-        <input name="bid" type="Number" step="0.01" placeholder="Your bid" min="{{price}}">
-        <input type="submit" value="Bid">
-    </form>
-    <br>
-
-    {% if user.is_authenticated %}
-        {% if already_exists == True%}
-            <form action="{% url 'removefromwatchlist' id user.username %}">
-                {% csrf_token %}
-                <input type="submit" value="Remove from watchlist">
-            </form>
-        {% else %}
-            <form action="{% url 'addtowatchlist' id user.username %}">
-                {% csrf_token %}
-                <input type="submit" value="Add to watchlist">
-            </form>   
-        {% endif %}
-    {% endif %}
-    <br>
-    
-    {% if user.is_authenticated %}
-        <form action="{% url 'addcomments' name %}" method="POST">
-            {% csrf_token %}
-            <p>Add a comment: </p>
-            <textarea style="height: 100px; width: 250px; resize: none" name="comment" required></textarea>
-            <br>
-            <input type="submit" value="Submit">
-        </form>
+    {% if bid_data.bid_closed == True %}
+        <h2>{{ name }}</h2>
+        <strong style="color: red">[CLOSED]</strong>
     {% else %}
-        <strong><a href="{%url 'login' %}">Login</a> to add a comment.</strong>
+        <h2>{{ name }}</h2>
     {% endif %}
+    <hr style="border-top: 2px dashed black">
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col col-lg-6 col-md-6 col-sm-12">
+                <p>About this product : {{ description }}</p>
+                <strong><p>Starting bid: ${{ price }}</p></strong>
+                <strong><p>Current bid: ${{bid_data.current_bid}}</p></strong>
+            
+                <p>Category: {{ category }}</p>
+                <p>Created on: {{ created }}</p>
+                <p>Listed by: <strong>{{listed_by}}</strong></p>
+                <p>Current bidder: <strong>{{bid_data.current_bidder}}</strong></p>
+            
+            
+                {% if bid_data.bid_closed == False %}
+                    {% if user.username == listed_by %}
+            
+                        {% if bid_data.current_bidder == None %}
+                            <form action="{% url 'close_bidding' name %}" method="POST">
+                                {% csrf_token %}
+                                <input type="submit" value="Close this listing!"> (Nobody bade on your item yet. Are you sure you want to close this?)
+                            </form>
+                        {% else %}
+                            <form action="{% url 'close_bidding' name %}" method="POST">
+                                {% csrf_token %}
+                                <input type="submit" value="Close this listing!"> ({{bid_data.current_bidder}} will have this item for ${{bid_data.current_bid}}!)
+                            </form>
+                        {% endif%}
+            
+                    {% else %}
+                        <strong>Place a new bid!</strong>
+                        <br>
+                        <form action="{% url 'bidding' name %}" method="POST">
+                            {% csrf_token %}
+                            <input name="bid" type="Number" step="0.01" placeholder="Your bid" min="{{bid_data.current_bid}}">
+                            <input type="submit" value="Bid">
+                        </form>
+                    {% endif %}
+                {% else %}
+            
+                    {% if bid_data.current_bidder == None %}
+                        <strong>Nobody has won this listing. This listing was closed by its owner, {{listed_by}}!</strong>
+                    {% else %}
+                        <strong>{{bid_data.current_bidder}} has won this item({{name}}) for ${{bid_data.current_bid}}!</strong>
+                    {% endif %}
+                    <br>
+                {% endif %}
+                <br>
+            
+            
+                {% if user.is_authenticated %}
+                    {% if already_exists == True%}
+                        <form action="{% url 'removefromwatchlist' id user.username %}">
+                            {% csrf_token %}
+                            <input type="submit" value="Remove from watchlist">
+                        </form>
+                    {% else %}
+                        <form action="{% url 'addtowatchlist' id user.username %}">
+                            {% csrf_token %}
+                            <input type="submit" value="Add to watchlist">
+                        </form>   
+                    {% endif %}
+                {% endif %}
+                <br>
+                
+                {% if user.is_authenticated %}
+                    <form action="{% url 'addcomments' name %}" method="POST">
+                        {% csrf_token %}
+                        <p>Add a comment: </p>
+                        <textarea style="height: 100px; width: 250px; resize: none" name="comment" required></textarea>
+                        <br>
+                        <input type="submit" value="Submit">
+                    </form>
+                {% else %}
+                    <strong><a href="{%url 'login' %}">Login</a> to add a comment.</strong>
+                {% endif %}
+                <br>
+            </div>
+            <div class="col col-lg-6 col-md-6 col-sm-12">
+                <img src="{{image_url}}" height="100%" width="100%" alt="No image found for this item." style="object-fit: cover">
+            </div>
+        </div>
+    </div>
 
     <hr style="border-top: 2px dashed black">
     <h4>Comments</h4>
@@ -58,7 +106,12 @@
         <br>
     {% endfor%}
 
-{% endblock %} 
+    {% endblock %} 
+
+
+
+
+    
 
 
 

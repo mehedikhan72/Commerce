@@ -13,6 +13,7 @@ class Listing(models.Model):
     category = models.CharField(max_length=64)
     listed_by = models.CharField(max_length=64)
     created = models.DateField(auto_now_add=False, auto_now=False, default=timezone.now)
+    bid_closed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name}"
@@ -32,7 +33,13 @@ class Comment(models.Model):
         return f"{self.comm}"
 
 class Bid(models.Model):
-    bid_item = models.ForeignKey(Listing, to_field="name", db_column="name", on_delete=models.CASCADE, related_name="bid_item", default=None)
+    id = models.AutoField(primary_key=True)
+    bid_item = models.CharField(max_length=64)
+    starting_bid = models.FloatField()
     current_bid = models.FloatField()
-    current_bidder = models.ForeignKey(User, to_field="username", db_column="username", on_delete=models.CASCADE, related_name="current_bidder", default=None)
-    first_bid_made = models.BooleanField(default=None)
+    current_bidder = models.CharField(max_length=64, null=True)
+    first_bid_made = models.BooleanField(default=False)
+    bid_closed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.bid_item} currently costs {self.current_bid}"

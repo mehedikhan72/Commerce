@@ -4,14 +4,22 @@
     <h2>{{ current_user }}'s watchlist</h2>
     <hr style="border-top: 2px dashed black">
     {% for listing in watchlist_items %}
-        <div class="items">
-            <h4>{{ listing.name }}</h4>
-            <P>Current bid: ${{ listing.price }}</P>
-            <p>Description: {{ listing.description }}</p>
-            <a href="{% url 'details' listing.name %}">View details</a>
-            <br>
-            <strong>Watchlisted</strong>
+    <div class="container-fluid items">
+        <div class="row">
+            <div class="col col-lg-6 col-md-6 col-sm-12">
+                <h4>{{ listing.name }}</h4>
+                {% if listing.bid_closed == True %}
+                    <strong style="color: red">[CLOSED]</strong>
+                {% endif %}
+                <P>Current bid: ${{ listing.price }}</P>
+                <p>Description: {{ listing.description }}</p>
+                <a href="{% url 'details' listing.name %}">View details</a>
+            </div>
+            <div class="col col-lg-6 col-md-6 col-sm-12" style="text-align: right">
+                <img src="{{listing.image_url}}" height="150px" width="150px" alt="No image found for this item.">
+            </div>
         </div>
-        <br>
+    </div>
+    <br>
     {% endfor %}
 {% endblock %}

@@ -104,6 +104,10 @@ def create_list(request, listed_by):
 
         list_item = Listing.objects.create(name=name, description=description, price=price, image_url=image_url, category=category, listed_by=listed_by)
         list_item.save()
+
+        # while creating an item, im also creating a bid instance for that item cause the starting bid would be the current bid.
+        new_bid = Bid.objects.create(bid_item=name, starting_bid=price, current_bid=price, current_bidder=None, first_bid_made=True, bid_closed=False)
+        new_bid.save()
         return HttpResponseRedirect(reverse("index"))
 
     categories = ["Fashion", "Toys", "Electronics", "Home", "Fantasy", "miscellaneous"]
@@ -139,6 +143,7 @@ def details(request, item):
         existing_watchlist = None
         already_exists=None
     comments = Comment.objects.filter(comm_item=id).values()
+    bid_data = Bid.objects.filter(bid_item=item).values().get()
 
     return render(request, "auctions/details.html",{
         "id" : id,
@@ -152,6 +157,7 @@ def details(request, item):
         "watchlist_items" : watchlist_items,
         "already_exists" : already_exists,
         "comments" : comments,
+        "bid_data" : bid_data
     })
 
 @login_required
@@ -175,7 +181,6 @@ def watchlist(request, current_user):
 def addcomments(request, item):
     if request.user.is_authenticated:
         current_user = request.user.username
-    # print(item)
     if request.method == "POST":
         comment = request.POST.get("comment")
         item_id = Listing.objects.filter(name=item)[0]
@@ -195,7 +200,6 @@ def categories(request):
 def category_items(request, category):
 
     listings = Listing.objects.filter(category=category).values()
-    print(listings)
     return render(request, "auctions/category_items.html",{
         "listings" : listings,
         "category" : category
@@ -209,23 +213,25 @@ def bidding(request, item):
     if request.method == "POST":
         new_bid = request.POST.get("bid")
 
-        b = Bid.objects.filter(bid_item = item).values().get()
-        print(b)
-        # if b["first_bid_made"] == None:
-        #     t = Bid.objects.create(bid_item=item, current_bid=new_bid, current_bidder=current_user, first_bid_made=True)
-
-        #     t = Listing.objects.get(name=item)
-        #     t.price = new_bid
-        #     t.save()
-
-        # else:
-
-
-
-    
+        b = Bid.objects.get(bid_item=item)
+        b.current_bid = new_bid
+        b.current_bidder = current_user
+        b.save()
 
     return HttpResponseRedirect(reverse("details", args=(item,)))
 
+@login_required
+def close_bidding(request, item):
+    b = Bid.objects.get(bid_item=item)
+    b.bid_closed = True
+    b.save()
+
+    l = Listing.objects.get(name=item)
+    l.bid_closed = True
+    l.save()
+    
+
+    return HttpResponseRedirect(reverse("details", args=(item,)))
 
 
 

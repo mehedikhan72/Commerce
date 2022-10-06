@@ -4,13 +4,37 @@
     <h2>Active Listings</h2>
     <hr style="border-top: 2px dashed black">
 
-    {% for listing in listings %}
-        <div class="items">
-            <h4>{{ listing.name }}</h4>
-            <P>Current bid: ${{ listing.price }}</P>
-            <p>Description: {{ listing.description }}</p>
-            <a href="{% url 'details' listing.name %}">View details</a>
-        </div>
-        <br>
-    {% endfor %}
+
+                {% for listing in listings %}
+                <div class="container-fluid items">
+                    <div class="row">
+                        <div class="col col-lg-6 col-md-6 col-sm-12">
+                            <h4>{{ listing.name }}</h4>
+                            {% if listing.bid_closed == True %}
+                                <strong style="color: red">[CLOSED]</strong>
+                            {% endif %}
+                            <P>Current bid: ${{ listing.price }}</P>
+                            <p>Description: {{ listing.description }}</p>
+                            <a href="{% url 'details' listing.name %}">View details</a>
+                        </div>
+                        <div class="col col-lg-6 col-md-6 col-sm-12" style="text-align: right">
+                            <img src="{{listing.image_url}}" height="150px" width="150px" alt="No image found for this item.">
+                        </div>
+                    </div>
+                </div>
+                <br>
+
+                {% endfor %}
+
+            <!-- <div class="col col-lg-6 col-md-6 col-sm-12">
+                {% for listing in listings %}
+                <div class="items">
+                    <img src="{{listing.image_url}}" height="600px" width="600px" alt="No image found for this item.">
+                </div>
+                <br>
+                {% endfor %}
+                <br>
+            </div> -->
+
+
 {% endblock %}
