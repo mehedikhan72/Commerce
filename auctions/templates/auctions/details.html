@@ -12,7 +12,7 @@
 
     <div class="container-fluid">
         <div class="row">
-            <div class="col col-lg-6 col-md-6 col-sm-12">
+            <div class="col col-lg-6 col-md-6 col-sm-12 col-12">
                 <p>About this product : {{ description }}</p>
                 <strong><p>Starting bid: ${{ price }}</p></strong>
                 <strong><p>Current bid: ${{bid_data.current_bid}}</p></strong>
@@ -43,7 +43,7 @@
                         <br>
                         <form action="{% url 'bidding' name %}" method="POST">
                             {% csrf_token %}
-                            <input name="bid" type="Number" step="0.01" placeholder="Your bid" min="{{bid_data.current_bid}}">
+                            <input name="bid" type="Number" step="0.01" placeholder="Your bid" min="{{bid_data.current_bid}}" required>
                             <input type="submit" value="Bid">
                         </form>
                     {% endif %}
@@ -65,14 +65,16 @@
                             {% csrf_token %}
                             <input type="submit" value="Remove from watchlist">
                         </form>
+                        <br>
                     {% else %}
                         <form action="{% url 'addtowatchlist' id user.username %}">
                             {% csrf_token %}
                             <input type="submit" value="Add to watchlist">
                         </form>   
+                        <br>
                     {% endif %}
                 {% endif %}
-                <br>
+
                 
                 {% if user.is_authenticated %}
                     <form action="{% url 'addcomments' name %}" method="POST">
@@ -87,8 +89,8 @@
                 {% endif %}
                 <br>
             </div>
-            <div class="col col-lg-6 col-md-6 col-sm-12">
-                <img src="{{image_url}}" height="100%" width="100%" alt="No image found for this item." style="object-fit: cover">
+            <div class="col col-lg-6 col-md-6 col-sm-12 col-12">
+                <img src="{{image_url}}" height="400px" width="400px" alt="No image found for this item.">
             </div>
         </div>
     </div>

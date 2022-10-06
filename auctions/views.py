@@ -13,7 +13,6 @@ def index(request):
         "listings" : Listing.objects.all()
     })
 
-
 def login_view(request):
     if request.method == "POST":
 
@@ -74,7 +73,16 @@ def create_list(request, listed_by):
         image_url = request.POST.get("image_url")
         category = request.POST.get("category")
 
-        # TODO: need to make sure the user cannot create a listing with a title that already exists.
+        existing_titles = Listing.objects.values('name')
+        t = []
+
+        for n in existing_titles.iterator():
+            t.append(n["name"])
+
+        if name in t:
+            return render(request, "auctions/error.html",{
+                "message" : "Title already exists. Choose another one."
+            })
 
         if not name:
             return render(request, "auctions/error.html",{
@@ -183,6 +191,11 @@ def addcomments(request, item):
         current_user = request.user.username
     if request.method == "POST":
         comment = request.POST.get("comment")
+        if not comment:
+            return render(request, "auctions/error.html",{
+                "message" : "Must enter a comment!"
+            })
+
         item_id = Listing.objects.filter(name=item)[0]
         per_id = User.objects.filter(username=current_user)[0]
 
@@ -212,6 +225,11 @@ def bidding(request, item):
 
     if request.method == "POST":
         new_bid = request.POST.get("bid")
+
+        if not new_bid:
+            return render(request, "auctions/error.html",{
+                "message" : "Must enter an amount!"
+            })
 
         b = Bid.objects.get(bid_item=item)
         b.current_bid = new_bid
